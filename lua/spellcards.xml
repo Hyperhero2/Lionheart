@@ -1,0 +1,45 @@
+<ActorFrame InitCommand="%function(self)
+	function nitg_send_spellcards(cards)
+		if table.getn(cards) == 0 or tonumber(GAMESTATE:GetVersionDate()) < 20170714 then return false end
+		
+		local s = GAMESTATE:GetCurrentSong()
+		s:SetNumSpellCards(table.getn(cards))
+		for i=1,table.getn(cards) do
+			local a = cards[i]
+			s:SetSpellCardTiming(i-1,a[1],a[2])
+			s:SetSpellCardName(i-1,a[3])
+			s:SetSpellCardDifficulty(i-1,a[4])
+			s:SetSpellCardColor(i-1,a[5][1],a[5][2],a[5][3],a[5][4])
+		end
+		
+	end
+	
+	function nitg_send_labels(labels)
+		if table.getn(labels) == 0 or tonumber(GAMESTATE:GetVersionDate()) < 20170714 then return false end
+		
+		local s = GAMESTATE:GetCurrentSong()
+		s:ClearLabels();
+		for i=1,table.getn(labels) do
+			s:AddLabel(labels[i][1],labels[i][2])
+		end
+		
+	end
+	
+	--start,end,name,difficulty,color
+	prefix_spellcards = {
+		--{40,64,'name',6,{.1,.2,.8,1}},
+	}
+	--20.000=Opening
+	--{20, 35, 'Opening', 8, }
+	--35.000=Shining Title
+	--69.000=Spin Cycle
+	--100.000=Oh good a break
+	--131.000=Tumble Dry
+	--195.000=Cycle Complete
+	--212.000=This literally has no notes
+	--228.000=The section where I use dpad
+	--259.000=Shining Finale
+	--292.000=Nani? Uta wa owattenai no?
+	--323.500=spiral go brrr
+	nitg_send_spellcards(prefix_spellcards)
+end"/>
