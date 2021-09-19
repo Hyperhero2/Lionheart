@@ -52,17 +52,22 @@ end"
 ------------------------------------------------
 --------- Sprites are going here ---------------
 ------------------------------------------------	
-	--<Layer
-		--File="images/shiningcredit.png"
-		--OnCommand="%
-		--function(self)
-			--self:xy(SCREEN_CENTER_X + 40, SCREEN_CENTER_Y + 45)
-			--self:zoom(0.15)
-			--self:vibrate()
-			--self:hibernate(20.770)
-			--prefix_shiningCredit = self
-		--end
-		--"/>
+	
+	<Layer
+		File="../bg/bg.png"
+		OnCommand="%
+		function(self)
+			self:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y)
+			self:diffusealpha(0)
+			prefix_background = self
+		end
+	"/>
+	<Layer Type="ActorProxy" InitCommand="%function(self)
+	self:SetTarget(P1)
+	end" />
+	<Layer Type="ActorProxy" InitCommand="%function(self)
+	self:SetTarget(P2)
+	end" />
 	
 -----------------------------------------------
 ----------- START EVERYTHING ELSE -------------
@@ -171,12 +176,64 @@ end"
 			--beat based mods
 			--{beat_start, beat_end, mods, len_or_end, player_number}
 			mods = {
-				{0,9999,'*2 3x, *-1 overhead, *-1 approachtype, *-1 dizzyholds, *-1 stealthpastreceptors, *-1 modtimer','end'},
+				{0,9999,'*2 *-1 overhead, *-1 approachtype, *-1 dizzyholds, *-1 stealthpastreceptors, *-1 modtimer, 100% cover','end'},
+				{0, 18, '*2 3x', 'end'},
+				{19, 13, '*2 0.2x', 'len'},
+				{32, 112, '*0.1 3x', 'len'},
+				{42, 30, '*-1 spiralholds', 'end'},
+				{316, 9999, '*0.25 1x', 'end'},
+				{144, 3, '*-1 0.1x', 'end'},
+				{147, 9999, '*2 3x', 'end'},
+				{240, 9999, '*-1 2x', 'end'},
+				--{3, 1.5, '*5 300% confusion, 400% zoomx', 'len'},
 			}
 			local function mod_insert(newMod)
 				table.insert(mods, newMod)
 			end
 			
+			for i = 100, 108, 1 do
+				if i % 2 == 1 then
+					mod_insert { i, 0.7, '*-1 2000% dizzy1', 'len' }
+					mod_insert { i + 0.7, 0.7, '*-1 0% dizzy1', 'len' }
+				end
+			end
+			
+			for i = 109, 116, 1 do
+				if i % 2 == 1 then
+					mod_insert { i, 0.7, '*-1 2000% dizzy2', 'len' }
+					mod_insert { i + 0.7, 0.7, '*-1 0% dizzy2', 'len' }
+				end
+			end
+			
+			for i = 117, 120, 1 do
+				if i % 2 == 1 then
+					mod_insert { i, 0.7, '*-1 2000% dizzy1', 'len' }
+					mod_insert { i + 0.7, 0.7, '*-1 0% dizzy1', 'len' }
+				else
+					mod_insert { i, 0.7, '*-1 2000% dizzy3', 'len' }
+					mod_insert { i + 0.7, 0.7, '*-1 0% dizzy3', 'len' }
+				end
+			end
+			
+			for i = 121, 123, 1 do
+				if i % 2 == 1 then
+					mod_insert { i, 0.7, '*-1 2000% dizzy1', 'len' }
+					mod_insert { i + 0.7, 0.7, '*-1 0% dizzy1', 'len' }
+				else
+					mod_insert { i, 0.7, '*-1 2000% dizzy0', 'len' }
+					mod_insert { i + 0.7, 0.7, '*-1 0% dizzy0', 'len' }
+				end
+			end
+			
+		for i = 196, 203 do
+				if i % 2 == 0 then
+					mod_insert { i, 1, '*100 5 rotationz, 300% bumpyz', 'len' }
+					mod_insert { i, 1, '*10 20% tiny', 'end' }
+				else
+					mod_insert { i, 1, '*100 -5 rotationz', 'len' }
+					mod_insert { i, 1, '*10 -20% tiny', 'len' }
+				end
+			end
 			--for i = 100, 112, 4 do
 				--if i % 4 == 0 then
 					--mod_insert { i, 0.5, '*-1 -25% flip', 'len' }
@@ -211,11 +268,241 @@ end"
 				--inBack    outBack    inOutBack    outInBack       --can take 1 optional parameter  - spring amount
 				--inBounce  outBounce  inOutBounce  outInBounce
 				
-			
--- most stuff should be here you dumb idiot			
+				
 			mods_ease = {
-						--{4, 16, 180, 360, function(a) SCREENMAN:GetTopScreen():rotationx(a) end, 'len', outBack},
 						--{4, 8, 0, 800, 'drunk', 'len', linear},
+						--{0, .1, 0, 100, 'cover', 'len', linear},
+						--{.1, 18.9, 100, 100, 'cover', 'len', linear},
+						--{19, 10, 100, 0, 'cover', 'len', inExpo},
+						
+						{4, 4, 0, 0.5, function(a) 
+						local screen = SCREENMAN:GetTopScreen()
+						local transform = condor.zoom(a)
+						screen:x(transform.x)
+						screen:y(transform.y)
+						screen:zoom(transform.zoom)
+						end, 'len', outExpo},
+						
+						{0, 1, 0, 100, 'stealth', 'len', linear},
+						{1, 18, 100, 100, 'stealth', 'len', linear},
+						{18, 4, 100, 1000, 'drawsize', 'len', inCirc},
+						{19, 100, 0, 1, function(a) prefix_background:diffusealpha(a) end, 'len', outBack},
+						{22, 34, 1000, 1000, 'drawsize', 'len', inCirc},
+						{19, 2, 100, 50, 'stealth', 'len', linear},
+						{21, 12, 50, 50, 'stealth', 'len', linear},
+						
+						{20, 12, 0, 100, 'tornado', 'len', linear},
+						
+						{17, 3, 0.5, 0.75, function(a) 
+						local screen = SCREENMAN:GetTopScreen()
+						local transform = condor.zoom(a)
+						screen:x(transform.x)
+						screen:y(transform.y)
+						screen:zoom(transform.zoom)
+						end, 'len', inExpo},
+						
+						{32, 2, 100, 0, 'tornado', 'len', linear},
+						
+						{32, 4, 0.75, 1, function(a) 
+						local screen = SCREENMAN:GetTopScreen()
+						local transform = condor.zoom(a)
+						screen:x(transform.x)
+						screen:y(transform.y)
+						screen:zoom(transform.zoom)
+						end, 'len', linear},
+						
+						{36, 28, 0, 200, 'beat', 'len', outExpo},
+						--{36, 10, 0, 45, function(a) SCREENMAN:GetTopScreen():rotationz(a) end, 'len', linear},
+						{36, 6, 0, -45, 'rotationx, movex', 'len', inQuad},
+						{42, 20, -45,-45, 'rotationx', 'len', inQuad},
+						{42, 5, 0, 20, 'rotationz', 'len', inQuad},
+						{47, 5, 20, -40, 'rotationz', 'len', inQuad},
+						{52, 5, -40, 60, 'rotationz', 'len', inQuad},
+						{57, 5, 60, -60, 'rotationz', 'len', inQuad},
+						{42, 5, 0, 100, 'bumpyy', 'len', inQuad},
+						{47, 18, 100, 100, 'bumpyy', 'len', linear},
+						
+						{64, 0.2, 10, 0, 'beat', 'len', inExpo},
+						
+						----------------Separate Playfields------------------
+						{66, .8, 0, 50, 'movex', 'len', outExpo, 1},
+						{66.7, .8, 50, 100, 'movex', 'len', outExpo, 1},
+						{67.4, .8, 100, 200, 'movex', 'len', outExpo, 1},
+						{68.1, 47.9, 200, 200, 'movex', 'len', inCirc, 1},
+						{66, .8, 0, -50, 'movex', 'len', outExpo, 2},
+						{66.7, .8, -50, -100, 'movex', 'len', outExpo, 2},
+						{67.4, .8, -100, -200, 'movex', 'len', outExpo, 2},
+						{68.1, 47.9, -200, -200, 'movex', 'len', inCirc, 2},
+						-----------------------------------------------------
+						{63.5, 0.7, 0, 100, 'reverse0, reverse1, reverse2, reverse3', 'len', inQuint},
+						{64, 18, 100, 100, 'reverse0, reverse1, reverse2, reverse3', 'len', linear},
+						{66, .7, 0, 75, 'flip, invert', 'len', outExpo},
+						{66.5, .7, 75, 125, 'invert', 'len', outExpo},
+						{66.5, .7, 75, 25, 'flip', 'len', outExpo},
+						{67, .7, 125, 100, 'invert', 'len', outExpo},
+						{67.5, .7, 100, 0, 'invert', 'len', outExpo},
+						{68, 1, 0, 30, 'drunk', 'len', inExpo},
+						{68, 1, 0, 50, 'beat', 'len', inExpo},
+						{69, 30, 30, 30, 'drunk', 'len', inExpo},
+						{69, 30, 50, 50, 'beat', 'len', inExpo},
+						
+						{80, 1, 100, 0, 'reverse3', 'len', outExpo},
+						{81, 4, 0, 0, 'reverse3', 'len', outExpo},
+						{81, 1, 100, 0, 'reverse0', 'len', outExpo},
+						{82, 3, 0, 0, 'reverse0', 'len', outExpo},
+						{82, 1, 100, 0, 'reverse2', 'len', outExpo},
+						{83, 2, 0, 0, 'reverse2', 'len', outExpo},
+						{83, 1, 100, 0, 'reverse1', 'len', outExpo},
+						{84, 1, 0, 0, 'reverse1', 'len', outExpo},
+						
+						{80, 2, 0, 45, 'rotationy', 'len', outCubic},
+						{82, 2, 45, -45, 'rotationy', 'len', outCubic},
+						{84, 2, -45, 0, 'rotationy', 'len', outCubic},
+						{85, 2, 0, 20, 'rotationz', 'len', linear},
+						{87, 4, 20, -20, 'rotationz', 'len', linear},
+						{90, 5, 0, 45, 'skewy', 'len', linear},
+						{95, 5, 0, -200, 'tinyx', 'len', inExpo},
+						
+						{98, 0.75, 0, 200, 'movez2, tinyy2', 'len', outElastic},
+						{98.75, .75, 200, 300, 'movez2, tinyz2', 'len', outElastic},
+						{99.5, .75, 300, 400, 'movez2, tinyz2', 'len', outElastic},
+						{100.25, 4.75, 400, 0, 'movez2, tinyz2', 'len', inCubic},
+						
+						{100, 28, 0, 100, 'tipsy, drunk, wave', 'len', inQuad},
+						
+						{116, 11.5, -200, 0, 'movex', 'len', inCirc, 2},
+						{116, 11.5, 200, 0, 'movex', 'len', inCirc, 1},
+						
+						{128, 0.67, 0, 20, 'rotationz', 'len', outQuad},
+						{128.67, 0.67, 20, -20, 'rotationz, rotationx', 'len', outQuad}, 
+						{129.34, 0.67, -20, 20, 'rotationz, rotationy', 'len', outQuad}, 
+						{130.01, 0.67, 20, -20, 'rotationz, rotationx', 'len', outQuad}, 
+						{131, 0.67, 0, 0, 'rotationz, rotationx', 'len', outQuad},
+						
+						{132, 1, 0, 500, 'drunkz', 'len', inQuad},
+						{133, 20, 500, 500, 'drunkz', 'len', inQuad},
+						{132, 1, 0, 300, 'beatz', 'len', inQuad},
+						{133, 20, 300, 300, 'beatz', 'len', inQuad},
+						
+						{156, 5, 0, 180, function(a) prefix_background:rotationz(a) end, 'len', outBack},
+						{156, 5, 0, -180, 'rotationz', 'len', outBack},
+						{160, .7, 0, 75, 'flip, invert', 'len', outExpo},
+						{160.5, .7, 75, 125, 'invert', 'len', outExpo},
+						{160.5, .7, 75, 25, 'flip', 'len', outExpo},
+						{161, .7, 125, 100, 'invert', 'len', outExpo},
+						{161.5, .7, 100, 0, 'invert', 'len', outExpo},
+						{162.67, .7, 0, -100, 'movex0, tiny0', 'len', outExpo},
+						{163.37, .7, -100, -200, 'movex0, tiny0', 'len', outExpo},
+						{164, 22, 0, 100, 'drunky', 'len', outExpo},
+						
+						{187, 1, 0, 1000, 'holdgirth1', 'len', outExpo},
+						{188, 1, 1000, 0, 'holdgirth1', 'len', outExpo},
+						{188, 0.67, 0, 100, 'movez', 'len', outElastic},
+						{188.67, 0.67, 100, 200, 'movez', 'len', outElastic},
+						{189.34, 0.67, 200, 300, 'movez', 'len', outElastic},
+						{189, 0.67, 300, 400, 'movez', 'len', outElastic},
+						{189.67, 0.67, 400, 500, 'movez', 'len', outElastic},
+						{190.34, 5, 500, 0, 'movez', 'len', outElastic},
+ 					
+						{192, 0.75, 0, 100, 'skewx', 'len', inCirc},
+						{192, 5, 180, 360, function(a) prefix_background:rotationz(a) end, 'len', outBack},
+						{193, 0.75, 0, -100, 'skewy', 'len', inCirc},
+						{194, 0.75, 0, 100, 'skewy', 'len', inCirc},
+						{195, 0.75, 0, -100, 'skewx', 'len', inCirc},
+						{196, 8, 0, 200, 'drunk', 'len', outElastic}, 
+						{204, 0.5, 200, 0, 'drunk', 'len', inElastic},
+						{204, 0.67, 0, 100, 'movez3', 'len', outElastic},
+						{204.67, .67, 100, 200, 'movez3', 'len', outElastic},
+						{205.34, .67, 200, 300, 'movez3', 'len', outElastic},
+						{206, 0.5, 0, 150, 'movez0', 'len', outElastic},
+						{206.5, 0.5, 150, 300, 'movez0', 'len', outElastic},
+						{207, 0.5, 0, 150, 'movez1', 'len', outElastic},
+						{207.5, 0.5, 0, 300, 'movez2', 'len', outElastic},
+						{208, 0.5, 150, 300, 'movez1', 'len', outElastic},
+						{208.75, .67, 120, 300, 'movez0', 'len', outElastic},
+						{204, 1, 300, 0, 'bumpyz', 'len', inCirc},
+						{209.5, 0.5, 120, 300, 'movez2', 'len', outElastic},
+						{210, 0.5, 120, 300, 'movez1', 'len', outElastic},
+						
+						{317, 7, 0, 50, 'flip', 'len', inCirc},
+						{317, 7, 0, 200, 'movey', 'len', inCirc},
+						{317, 7, 100, 400, 'zoomx', 'len', inCirc},
+						{317, 7, 100, 300, 'zoomy', 'len', inCirc},
+						
+						{204, .5, 0, 100, 'beat', 'len', outElastic},
+						{204.5, 6.5, 100, 100, 'beat', 'len', outElastic}, 
+						{204, .8, 0, 50, 'movex', 'len', outExpo, 1},
+						{204.8, .8, 50, 100, 'movex', 'len', outExpo, 1},
+						{205.4, .8, 100, 200, 'movex', 'len', outExpo, 1},
+						{206.1, 50.9, 200, 200, 'movex', 'len', inCirc, 1},
+						{204, .8, 0, -50, 'movex', 'len', outExpo, 2},
+						{204.8, .8, -50, -100, 'movex', 'len', outExpo, 2},
+						{205.4, .8, -100, -200, 'movex', 'len', outExpo, 2},
+						{206.1, 50.9, -200, -200, 'movex', 'len', inCirc, 2},
+						{212, 1, 0, -200, 'holdtiny1', 'len', outCirc},
+						{212, 1, 0, 200, 'beat', 'len', outCirc},
+						{213, 7, 200, 200, 'beat', 'len', outCirc},
+						{220, 1, 200, 0, 'beat', 'len', outCirc},
+						{220, 5, 100, 150, 'zoom', 'len', outCirc},
+						
+						{224, 4, 0, 400, 'movey', 'len', outCirc, 1},
+						{228, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						{231, 3, 0, 400, 'movey', 'len', outBounce, 1},
+						{234, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						{237, 3, 0, 400, 'movey', 'len', outBounce, 1},
+						{240, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						{243, 3, 0, 400, 'movey', 'len', outBounce, 1},
+						{246, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						{249, 3, 0, 400, 'movey', 'len', outBounce, 1},
+						{252, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						{255, 3, 0, 400, 'movey', 'len', outBounce, 1},
+						{258, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						{261, 3, 0, 400, 'movey', 'len', outBounce, 1},
+						{264, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						{267, 3, 0, 400, 'movey', 'len', outBounce, 1},
+						{270, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						{273, 3, 0, 400, 'movey', 'len', outBounce, 1},
+						{276, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						{279, 3, 0, 400, 'movey', 'len', outBounce, 1},
+						{282, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						{285, 3, 0, 400, 'movey', 'len', outBounce, 1},
+						{288, 3, 400, 0, 'movey', 'len', inBounce, 1},
+						
+						{221, 3, 0, 400, 'movey', 'len', linear, 2},
+						{224, 3, 400, 0, 'movey', 'len', inBounce, 2},
+						{228, 3, 0, 400, 'movey', 'len', outBounce, 2},
+						{231, 3, 400, 0, 'movey', 'len', inBounce, 2},
+						{234, 3, 0, 400, 'movey', 'len', outBounce, 2},
+						{237, 3, 400, 0, 'movey', 'len', inBounce, 2},
+						{240, 3, 0, 400, 'movey', 'len', outBounce, 2},
+						{243, 3, 400, 0, 'movey', 'len', inBounce, 2},
+						{246, 3, 0, 400, 'movey', 'len', outBounce, 2},
+						{249, 3, 400, 0, 'movey', 'len', inBounce, 2},
+						{252, 3, 0, 400, 'movey', 'len', outBounce, 2},
+						{255, 3, 400, 0, 'movey', 'len', inBounce, 2},
+						{258, 3, 0, -400, 'movey', 'len', outBounce, 2},
+						{261, 3, -400, 0, 'movey', 'len', inBounce, 2},
+						{264, 3, 0, -400, 'movey', 'len', outBounce, 2},
+						{267, 3, -400, 0, 'movey', 'len', inBounce, 2},
+						{270, 3, 0, -400, 'movey', 'len', outBounce, 2},
+						{273, 3, -400, 0, 'movey', 'len', inBounce, 2},
+						{276, 3, 0, -400, 'movey', 'len', outBounce, 2},
+						{279, 3, -400, 0, 'movey', 'len', inBounce, 2},
+						{282, 3, 0, -400, 'movey', 'len', outBounce, 2},
+						{285, 3, -400, 0, 'movey', 'len', inBounce, 2},
+						{288, 3, 0, -400, 'movey', 'len', outBounce, 2},
+						{292, 15, -400, 0, 'movey', 'len', linear, 2},
+						{263, 20, 100, 100, 'reverse', 'len', outBounce, 2},
+						
+						{292, 17, 0, 100, 'drunk', 'len', outBounce, 1},
+						{309, 15, 100, 100, 'drunk', 'len', outBounce, 1},
+						{292, 17, 0, -100, 'drunk', 'len', outBounce, 2},
+						{309, 15, -100, -100, 'drunk', 'len', outBounce, 2},
+						
+						{324, 8, 50, 50, 'flip', 'len', inCirc},
+						{324, 8, 200, 200, 'movey', 'len', inCirc},
+						{324, 8, 400, 400, 'zoomx', 'len', inCirc},
+						{324, 8, 300, 300, 'zoomy', 'len', inCirc},
 						
 						
 						
@@ -226,6 +513,29 @@ end"
 				--{4, 4, 360, 0, function(a) SCREENMAN:GetTopScreen():rotationz(a) end, 'len', outBack},
 			}
 			
+
+-- Thank you Halcyoniix for providing this code (and I think Condor for making it?)--
+condor = {}
+condor.const1 = math.sqrt(math.pow(SCREEN_WIDTH/2,2)+math.pow(SCREEN_HEIGHT/2,2))
+condor.const2 = 180+math.deg(math.atan(SCREEN_HEIGHT/SCREEN_WIDTH))
+condor.zoom = function(amt)
+    return
+    {
+        x = SCREEN_WIDTH/2 + (condor.const1 * amt * math.cos( (condor.const2) / 180 * math.pi )),
+        y = SCREEN_HEIGHT/2 + (condor.const1 * amt * math.sin( (condor.const2) / 180 * math.pi )),
+        zoom = amt
+    }
+end
+condor.rotation = function(ang)
+    return
+    {
+        x = SCREEN_WIDTH/2 + (condor.const1 * math.cos( (ang+condor.const2) / 180 * math.pi)),
+        y = SCREEN_HEIGHT/2 + (condor.const1 * math.sin( (ang+condor.const2) / 180 * math.pi)),
+        rot = ang
+    }
+end
+----------------------------------------------------------------
+			
 			--time based mods
 			mod_time = 0;
 			--{time_start, time_end, mods, len_or_end, player_number}
@@ -235,11 +545,20 @@ end"
 			-- you can now write perframe stuff without having to scroll down!
 			-- {beat_start,beat_end,function(beat,deltatime)}
 			mod_perframes = {
-			    --{36, 67.5, function(beat,deltatime)
-					--if perframe(36, 67.5) then
-					--GAMESTATE:ApplyGameCommand('mod,*-1 '.. -math.abs(math.sin(beat * math.pi)) * -100 .. ' movez');
-					--end
-				--end},
+			--{68, 96, function(beat,deltatime)
+				--	if perframe(68, 96) then
+				--	GAMESTATE:ApplyGameCommand('mod,*-1 '.. -math.abs(math.sin(beat * math.pi)) * 100 .. ' movey');
+				--	end
+				
+				--if perframe(68, 96) then
+					--GAMESTATE:ApplyGameCommand('mod,*2 '.. (beat - 68) * 200 .. ' centered2');
+				--end
+					
+				--if beat < 100 then
+					--local pos = (beat - 68) * -128
+					--GAMESTATE:ApplyGameCommand('mod,*1.28 '.. pos .. ' y');
+				--end
+			--end},
 			
 				--{18,24,function(beat,deltatime)
 					--do stuff every frame from beat 18-24
@@ -256,11 +575,11 @@ end"
 			mod_actions = {
 				{0,'GetProxy',true},
 				--{5, function()
-					--prefix_shiningArtist:diffusealpha(0.8)
-					--prefix_shiningTitle:diffusealpha(0.8)
-					--prefix_shiningCredit:diffusealpha(0.8)
-				--end, true},
-					
+				--	prefix_shiningArtist:diffusealpha(0.8)
+				--	prefix_shiningTitle:diffusealpha(0.8)
+				--	prefix_shiningCredit:diffusealpha(0.8)
+				--end, true}
+		
 				{0,function()
 					for pn=1,2 do
 						local a = Plr(pn)

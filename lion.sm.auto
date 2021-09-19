@@ -18,7 +18,9 @@
 #BPMS:0.000=170.000;
 #STOPS:;
 #TIMESIGNATURES:0.000=4=4;
-#BGCHANGES:;
+#BGCHANGES:0.000=bg=1.000=0=0=1=====,
+99999=-nosongbg-=1.000=0=0=0 // don't automatically add -songbackground-
+;
 
 //The majority of simfile scripts and visual effects are stored here.
 #FGCHANGES:0.000=lua=1.000=0=0=1=====,
@@ -39,7 +41,7 @@
      Hyperhero2:
      Challenge:
      8:
-     0.464,0.566,0.008,0.312,0.223:
+     0.464,0.567,0.008,0.312,0.223:
 0000
 0000
 0000
