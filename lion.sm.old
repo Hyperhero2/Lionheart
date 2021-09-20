@@ -24,11 +24,21 @@
 #FGCHANGES:0.000=lua=1.000=0=0=1=====,
 ;
 
-#LABELS:4.000=Intro starts=0
-36.000=bg on, start mods=0
-42.000=change=0
-44.000=change=0
-46.500=triple change on offbeat=0
+#LABELS:4.000=Intro=0
+36.000=Fire It Up!=0
+66.000=Defending The Shield=0
+100.000=Rest=0
+128.000=Battle!=0
+156.000=Gravity-defying Moves=0
+164.000=A winner is you=0
+187.000=sike=0
+197.500=Unfocused Attack=0
+204.000=Combo Breaker=0
+212.000=Gaining the Upper Hand=0
+224.000=Last Chance Attack=0
+292.000=Opponent Defeated=0
+308.000=Victory Spoils=0
+324.000=Don't Hit This=0
 ;
 
 #KEYSOUNDS:;
